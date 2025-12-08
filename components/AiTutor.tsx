@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, X, Sparkles, AlertTriangle, WifiOff } from 'lucide-react';
+import { Send, Bot, X, Sparkles, AlertTriangle, WifiOff, Link as LinkIcon } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import { useLanguage } from '../context/LanguageContext';
 import { ApiDefinition } from '../types';
@@ -78,6 +78,31 @@ export const AiTutor: React.FC<AiTutorProps> = ({ apiDefinition, lastResponse, l
       return response + t('fb_default').replace('{{name}}', apiDefinition.name);
   };
 
+  // Helper to fetch key from Google Sheet
+  const fetchKeyFromSheet = async (): Promise<string | null> => {
+      try {
+          const sheetId = '1Djgc4uo3kIXxfOgyHeBujz7RfXILP6auIdpMHR1Lf0s';
+          // Using Google Visualization API query to get CSV from specific sheet name 'key'
+          const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=key&range=A1`;
+          
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("Failed to fetch sheet");
+          
+          let text = await res.text();
+          // Remove potential quotes added by CSV format
+          text = text.replace(/"/g, '').trim();
+          
+          if (text.startsWith('AIza')) {
+              console.log("Key fetched successfully from Google Sheet");
+              return text;
+          }
+          return null;
+      } catch (e) {
+          console.error("Error fetching key from sheet:", e);
+          return null;
+      }
+  };
+
   const handleSend = async () => {
     if (!input.trim()) return;
 
@@ -91,10 +116,20 @@ export const AiTutor: React.FC<AiTutorProps> = ({ apiDefinition, lastResponse, l
     setInput('');
     setIsLoading(true);
 
-    // Check if key exists before even trying, saves time
-    const apiKey = process.env.API_KEY;
+    // 1. Try Environment Variable first
+    let apiKey = process.env.API_KEY;
     
+    // 2. If invalid, try Google Sheet
     if (!apiKey || apiKey === '' || apiKey.includes('YOUR_API_KEY')) {
+         const sheetKey = await fetchKeyFromSheet();
+         if (sheetKey) {
+             apiKey = sheetKey;
+         }
+    }
+
+    // 3. Final Check
+    if (!apiKey || apiKey === '' || apiKey.includes('YOUR_API_KEY')) {
+         console.warn("AiTutor: API Key missing in Env AND Sheet. Switching to Offline Mode.");
          // Immediate fallback
          setTimeout(() => {
              const fallbackMsg: Message = {
@@ -162,7 +197,8 @@ export const AiTutor: React.FC<AiTutorProps> = ({ apiDefinition, lastResponse, l
       setMessages(prev => [...prev, aiMessage]);
 
     } catch (error) {
-      console.warn("AI Unavailable, switching to decision tree", error);
+      console.error("AiTutor Connection Error:", error);
+      console.warn("Switching to internal logic (Decision Tree) due to API failure.");
       
       // FALLBACK MECHANISM ACTIVATED
       const fallbackMsg: Message = {
