@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { APIS } from '../constants';
-import { Menu, X, Layers, ShieldCheck, Sun, Moon } from 'lucide-react';
+import { getLocalizedApis } from '../constants';
+import { Menu, X, Layers, ShieldCheck, Sun, Moon, Globe } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
+
+  const apis = getLocalizedApis(language);
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'en' ? 'pt' : 'en');
+  };
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-slate-100 font-sans overflow-hidden transition-colors duration-200">
@@ -41,21 +49,21 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             className={`block px-4 py-2 rounded-md transition-colors ${location.pathname === '/' ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 text-slate-300'}`}
             onClick={() => setSidebarOpen(false)}
           >
-            Dashboard
+            {t('dashboard')}
           </Link>
           <Link 
             to="/tutorial" 
             className={`block px-4 py-2 rounded-md transition-colors ${location.pathname === '/tutorial' ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 text-slate-300'}`}
             onClick={() => setSidebarOpen(false)}
           >
-            First Integration (Guide)
+            {t('tutorial_link')}
           </Link>
 
           <div className="mt-6 mb-2 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            API Directory
+            {t('api_directory')}
           </div>
           
-          {APIS.map(api => (
+          {apis.map(api => (
             <Link
               key={api.id}
               to={`/api/${api.id}`}
@@ -68,14 +76,21 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           ))}
         </nav>
 
-        {/* Theme Toggle in Sidebar */}
-        <div className="p-4 border-t border-slate-700">
+        {/* Toggles in Sidebar */}
+        <div className="p-4 border-t border-slate-700 space-y-2">
+           <button 
+             onClick={toggleLanguage}
+             className="flex items-center justify-center w-full gap-2 px-4 py-2 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+           >
+             <Globe size={18} />
+             <span>{language === 'en' ? 'Português' : 'English'}</span>
+           </button>
            <button 
              onClick={toggleTheme}
              className="flex items-center justify-center w-full gap-2 px-4 py-2 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
            >
              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-             <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+             <span>{theme === 'dark' ? t('light_mode') : t('dark_mode')}</span>
            </button>
         </div>
       </aside>

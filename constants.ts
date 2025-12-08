@@ -1,6 +1,7 @@
 import { ApiDefinition } from './types';
 
-export const APIS: ApiDefinition[] = [
+// Raw data includes translation objects
+const RAW_APIS: ApiDefinition[] = [
   {
     id: 'openweathermap',
     name: 'OpenWeatherMap',
@@ -24,7 +25,24 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'Which HTTP method is used to get data?', options: ['GET', 'POST', 'DELETE'], correctAnswer: 0 },
       { question: 'Where should you store your API Key?', options: ['In the HTML', 'Environment Variables', 'Public GitHub Repo'], correctAnswer: 1 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Clima',
+        description: 'Acesse dados meteorológicos atuais para qualquer local, incluindo mais de 200.000 cidades.',
+        jsonExplanation: {
+          'main.temp': 'Temperatura em Kelvin (padrão)',
+          'weather[0].description': 'Descrição textual (ex: nublado)',
+          'wind.speed': 'Velocidade do vento em m/s'
+        },
+        securityChecklist: ['Nunca exponha a chave da API no frontend.', 'Use variáveis de ambiente.', 'Defina limites de orçamento no painel.'],
+        exercise: 'Modifique a requisição para obter o clima de "Tokyo" e exiba a temperatura em Celsius.',
+        quiz: [
+          { question: 'Qual método HTTP é usado para obter dados?', options: ['GET', 'POST', 'DELETE'], correctAnswer: 0 },
+          { question: 'Onde você deve armazenar sua chave de API?', options: ['No HTML', 'Variáveis de Ambiente', 'Repositório Público'], correctAnswer: 1 }
+        ]
+      }
+    }
   },
   {
     id: 'rest-countries',
@@ -49,7 +67,24 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'Does this API require an API Key?', options: ['Yes', 'No', 'Only for commercial use'], correctAnswer: 1 },
       { question: 'What is the data type of "capital"?', options: ['String', 'Number', 'Array'], correctAnswer: 2 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Geográfico',
+        description: 'Obtenha informações sobre países via uma API RESTful.',
+        jsonExplanation: {
+          'name.common': 'Nome comum do país',
+          'capital': 'Array de capitais',
+          'population': 'Contagem total da população'
+        },
+        securityChecklist: ['Valide a entrada do usuário para nomes de países.', 'Faça cache dos resultados para economizar banda.'],
+        exercise: 'Busque dados da "France" e exiba a URL da bandeira.',
+        quiz: [
+          { question: 'Esta API requer uma chave?', options: ['Sim', 'Não', 'Apenas para uso comercial'], correctAnswer: 1 },
+          { question: 'Qual é o tipo de dado de "capital"?', options: ['String', 'Number', 'Array'], correctAnswer: 2 }
+        ]
+      }
+    }
   },
   {
     id: 'jsonplaceholder',
@@ -74,7 +109,24 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'What is this API primarily used for?', options: ['Production Data', 'Testing & Prototyping', 'Weather'], correctAnswer: 1 },
       { question: 'Can you send POST requests to it?', options: ['Yes', 'No'], correctAnswer: 0 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Simulação',
+        description: 'API falsa gratuita para testes e prototipagem.',
+        jsonExplanation: {
+          'userId': 'ID do usuário que postou',
+          'title': 'O título da postagem',
+          'body': 'O texto do conteúdo principal'
+        },
+        securityChecklist: ['Seguro para testes, não use para autenticação real.', 'Sem limites de taxa, mas seja razoável.'],
+        exercise: 'Busque o post ID #5 e exiba seu título.',
+        quiz: [
+          { question: 'Para que serve esta API principalmente?', options: ['Dados de Produção', 'Testes e Prototipagem', 'Clima'], correctAnswer: 1 },
+          { question: 'Você pode enviar requisições POST para ela?', options: ['Sim', 'Não'], correctAnswer: 0 }
+        ]
+      }
+    }
   },
   {
     id: 'cat-facts',
@@ -95,7 +147,20 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'What is the format of the response?', options: ['XML', 'JSON', 'HTML'], correctAnswer: 1 },
       { question: 'Is authentication needed?', options: ['Yes', 'No'], correctAnswer: 1 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Curiosidades',
+        description: 'Fatos diários sobre gatos. Simples e divertido.',
+        jsonExplanation: { 'fact': 'A string contendo o fato', 'length': 'Comprimento da string' },
+        securityChecklist: ['Nenhum necessário. API Pública.'],
+        exercise: 'Crie um botão que busca um novo fato quando clicado.',
+        quiz: [
+          { question: 'Qual é o formato da resposta?', options: ['XML', 'JSON', 'HTML'], correctAnswer: 1 },
+          { question: 'Autenticação é necessária?', options: ['Sim', 'Não'], correctAnswer: 1 }
+        ]
+      }
+    }
   },
   {
     id: 'dog-ceo',
@@ -116,7 +181,20 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'What does the "message" field contain?', options: ['A text greeting', 'The image URL', 'The breed name'], correctAnswer: 1 },
       { question: 'Is this API free?', options: ['Yes', 'No'], correctAnswer: 0 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Animais',
+        description: 'A maior coleção de fotos de cães open source da internet.',
+        jsonExplanation: { 'message': 'URL da imagem', 'status': 'Status da resposta (sucesso)' },
+        securityChecklist: ['Verifique as URLs das imagens antes de exibir, se necessário.'],
+        exercise: 'Busque uma imagem aleatória de uma raça específica (ex: hound).',
+        quiz: [
+          { question: 'O que o campo "message" contém?', options: ['Uma saudação', 'A URL da imagem', 'O nome da raça'], correctAnswer: 1 },
+          { question: 'Esta API é gratuita?', options: ['Sim', 'Não'], correctAnswer: 0 }
+        ]
+      }
+    }
   },
   {
     id: 'spacex',
@@ -137,7 +215,20 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'Does it support V4 of the API?', options: ['Yes', 'No'], correctAnswer: 0 },
       { question: 'Who maintains this API?', options: ['NASA', 'Open Source Community', 'Amazon'], correctAnswer: 1 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Espaço',
+        description: 'API REST Open Source para dados de lançamentos, foguetes, cápsulas e Starlink da SpaceX.',
+        jsonExplanation: { 'name': 'Nome da missão', 'date_utc': 'Data de lançamento', 'success': 'Booleano indicando sucesso' },
+        securityChecklist: ['Alto volume de requisições pode ser limitado.'],
+        exercise: 'Descubra o nome do foguete usado no último lançamento.',
+        quiz: [
+          { question: 'Suporta a V4 da API?', options: ['Sim', 'Não'], correctAnswer: 0 },
+          { question: 'Quem mantém esta API?', options: ['NASA', 'Comunidade Open Source', 'Amazon'], correctAnswer: 1 }
+        ]
+      }
+    }
   },
   {
     id: 'coingecko',
@@ -158,7 +249,20 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'What is the rate limit for the free tier?', options: ['Unlimited', '10-30 req/min', '1 req/day'], correctAnswer: 1 },
       { question: 'What parameter sets the currency?', options: ['vs_currencies', 'money', 'cash'], correctAnswer: 0 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Finanças',
+        description: 'Preços de criptomoedas e dados de mercado.',
+        jsonExplanation: { 'bitcoin.usd': 'Preço atual do Bitcoin em USD' },
+        securityChecklist: ['Faça cache para evitar limites (aprox 10-30 req/min grátis).'],
+        exercise: 'Busque o preço do Ethereum (ethereum) em EUR.',
+        quiz: [
+          { question: 'Qual é o limite da camada gratuita?', options: ['Ilimitado', '10-30 req/min', '1 req/dia'], correctAnswer: 1 },
+          { question: 'Qual parâmetro define a moeda?', options: ['vs_currencies', 'money', 'cash'], correctAnswer: 0 }
+        ]
+      }
+    }
   },
   {
     id: 'agify',
@@ -179,7 +283,20 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'What does "count" represent?', options: ['The age', 'The number of people with that name analyzed', 'Error code'], correctAnswer: 1 },
       { question: 'Can you batch names?', options: ['Yes', 'No'], correctAnswer: 0 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Dados',
+        description: 'Prevê a idade de uma pessoa com base em seu nome.',
+        jsonExplanation: { 'name': 'Nome de entrada', 'age': 'Idade prevista', 'count': 'Tamanho da amostra' },
+        securityChecklist: ['Valide o comprimento do nome.'],
+        exercise: 'Crie um formulário onde usuários digitam um nome e veem a idade prevista.',
+        quiz: [
+          { question: 'O que "count" representa?', options: ['A idade', 'Número de pessoas analisadas', 'Código de erro'], correctAnswer: 1 },
+          { question: 'Você pode enviar nomes em lote?', options: ['Sim', 'Não'], correctAnswer: 0 }
+        ]
+      }
+    }
   },
   {
     id: 'bored-api',
@@ -200,7 +317,20 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'Can you filter by price?', options: ['Yes', 'No'], correctAnswer: 0 },
       { question: 'What is the default return format?', options: ['JSON', 'XML'], correctAnswer: 0 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Entretenimento',
+        description: 'Ajuda você a encontrar coisas para fazer quando está entediado.',
+        jsonExplanation: { 'activity': 'Atividade sugerida', 'type': 'Categoria', 'participants': 'Número de pessoas' },
+        securityChecklist: ['Sem preocupações específicas de segurança.'],
+        exercise: 'Filtre atividades por type="education".',
+        quiz: [
+          { question: 'Pode filtrar por preço?', options: ['Sim', 'Não'], correctAnswer: 0 },
+          { question: 'Qual é o formato padrão?', options: ['JSON', 'XML'], correctAnswer: 0 }
+        ]
+      }
+    }
   },
   {
     id: 'news-api',
@@ -221,9 +351,22 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'Can you use this directly in a production frontend?', options: ['Yes', 'No, use a proxy'], correctAnswer: 1 },
       { question: 'What tier is required for commercial use?', options: ['Developer', 'Business'], correctAnswer: 1 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Notícias',
+        description: 'Localize artigos e manchetes de notícias de fontes e blogs pela web.',
+        jsonExplanation: { 'articles': 'Array de objetos de artigo', 'title': 'Manchete', 'url': 'Link para história completa' },
+        securityChecklist: ['NÃO use no client-side em produção (Proxy necessário).', 'Chave é restrita a localhost no nível gratuito.'],
+        exercise: 'Busque notícias de esportes de uma categoria específica.',
+        quiz: [
+          { question: 'Pode usar direto no frontend em produção?', options: ['Sim', 'Não, use um proxy'], correctAnswer: 1 },
+          { question: 'Qual nível é necessário para uso comercial?', options: ['Desenvolvedor', 'Negócios'], correctAnswer: 1 }
+        ]
+      }
+    }
   },
-   {
+  {
     id: 'pokeapi',
     name: 'PokéAPI',
     category: 'Games',
@@ -242,7 +385,20 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'Is this API rate limited?', options: ['Yes, reasonably', 'No, never'], correctAnswer: 0 },
       { question: 'Does it include audio cries?', options: ['Yes', 'No'], correctAnswer: 0 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Jogos',
+        description: 'Todos os dados de Pokémon que você precisará em um só lugar.',
+        jsonExplanation: { 'name': 'Nome do Pokemon', 'weight': 'Peso em hectogramas', 'sprites': 'Objeto contendo URLs de imagens' },
+        securityChecklist: ['Faça cache agressivamente, dados mudam raramente.'],
+        exercise: 'Exiba o sprite "front_default" para Pikachu.',
+        quiz: [
+          { question: 'Esta API tem limite de taxa?', options: ['Sim, razoável', 'Não, nunca'], correctAnswer: 0 },
+          { question: 'Inclui áudios?', options: ['Sim', 'Não'], correctAnswer: 0 }
+        ]
+      }
+    }
   },
   {
     id: 'joke-api',
@@ -263,7 +419,20 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'Can you filter out NSFW jokes?', options: ['Yes', 'No'], correctAnswer: 0 },
       { question: 'What are the two types of jokes?', options: ['single & twopart', 'funny & sad'], correctAnswer: 0 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Entretenimento',
+        description: 'Interface uniforme para buscar piadas de muitas fontes.',
+        jsonExplanation: { 'setup': 'A introdução da piada', 'delivery': 'A conclusão (punchline)', 'safe': 'Booleano se é seguro para o trabalho' },
+        securityChecklist: ['Verifique a flag "safe" antes de exibir para públicos gerais.'],
+        exercise: 'Busque apenas piadas de "Programação".',
+        quiz: [
+          { question: 'Pode filtrar piadas NSFW?', options: ['Sim', 'Não'], correctAnswer: 0 },
+          { question: 'Quais são os dois tipos de piadas?', options: ['single & twopart', 'funny & sad'], correctAnswer: 0 }
+        ]
+      }
+    }
   },
   {
     id: 'randomuser',
@@ -284,7 +453,20 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'Is the data real?', options: ['Yes', 'No'], correctAnswer: 1 },
       { question: 'Can you request a specific gender?', options: ['Yes', 'No'], correctAnswer: 0 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Simulação',
+        description: 'Como Lorem Ipsum, mas para pessoas.',
+        jsonExplanation: { 'results[0].name.first': 'Primeiro nome', 'results[0].email': 'Email falso', 'results[0].picture.medium': 'Foto de perfil' },
+        securityChecklist: ['Dados são gerados aleatoriamente, não trate como pessoas reais.'],
+        exercise: 'Gere 5 usuários em uma requisição.',
+        quiz: [
+          { question: 'Os dados são reais?', options: ['Sim', 'Não'], correctAnswer: 1 },
+          { question: 'Você pode solicitar um gênero específico?', options: ['Sim', 'Não'], correctAnswer: 0 }
+        ]
+      }
+    }
   },
   {
     id: 'ipify',
@@ -305,7 +487,20 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'What is the default format?', options: ['Text', 'JSON'], correctAnswer: 0 },
       { question: 'Does it scale to millions of requests?', options: ['Yes', 'No'], correctAnswer: 0 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Ferramentas',
+        description: 'Uma API simples de endereço IP público.',
+        jsonExplanation: { 'ip': 'Seu endereço IP público' },
+        securityChecklist: ['Considere implicações de privacidade ao armazenar IPs.'],
+        exercise: 'Exiba o IP atual do usuário ao carregar.',
+        quiz: [
+          { question: 'Qual é o formato padrão?', options: ['Texto', 'JSON'], correctAnswer: 0 },
+          { question: 'Escala para milhões de requisições?', options: ['Sim', 'Não'], correctAnswer: 0 }
+        ]
+      }
+    }
   },
   {
     id: 'nationalize',
@@ -326,7 +521,20 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'What does probability represent?', options: ['Certainty', 'Population'], correctAnswer: 0 },
       { question: 'What is the limit for free requests?', options: ['1000/day', 'Unlimited'], correctAnswer: 0 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Dados',
+        description: 'Preveja a nacionalidade de um nome.',
+        jsonExplanation: { 'country': 'Array de países prováveis', 'country_id': 'Código ISO', 'probability': 'Confiança de 0 a 1' },
+        securityChecklist: ['Lide com resultados vazios graciosamente.'],
+        exercise: 'Mostre a bandeira do país mais provável usando o resultado.',
+        quiz: [
+          { question: 'O que a probabilidade representa?', options: ['Certeza', 'População'], correctAnswer: 0 },
+          { question: 'Qual é o limite para requisições gratuitas?', options: ['1000/dia', 'Ilimitado'], correctAnswer: 0 }
+        ]
+      }
+    }
   },
   {
     id: 'zippopotamus',
@@ -347,7 +555,20 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'Does it support only US?', options: ['Yes', 'No, over 60 countries'], correctAnswer: 1 },
       { question: 'Is auth required?', options: ['Yes', 'No'], correctAnswer: 1 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Geográfico',
+        description: 'Códigos postais e informações de CEP.',
+        jsonExplanation: { 'country': 'Nome do País', 'places': 'Array de lugares', 'state': 'Estado' },
+        securityChecklist: ['Verifique formato do CEP antes de enviar.'],
+        exercise: 'Crie um formulário que preenche Cidade/Estado quando o CEP é inserido.',
+        quiz: [
+          { question: 'Suporta apenas os EUA?', options: ['Sim', 'Não, mais de 60 países'], correctAnswer: 1 },
+          { question: 'Auth é necessária?', options: ['Sim', 'Não'], correctAnswer: 1 }
+        ]
+      }
+    }
   },
   {
     id: 'open-library',
@@ -368,7 +589,20 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'Who runs Open Library?', options: ['Google', 'Internet Archive'], correctAnswer: 1 },
       { question: 'Is it free?', options: ['Yes', 'No'], correctAnswer: 0 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Livros',
+        description: 'Pesquise livros e obtenha dados bibliográficos.',
+        jsonExplanation: { 'docs': 'Array de resultados de livros', 'author_name': 'Array de autores', 'publish_year': 'Array de anos' },
+        securityChecklist: ['Respostas podem ser grandes, use paginação.'],
+        exercise: 'Exiba a imagem da capa do primeiro resultado.',
+        quiz: [
+          { question: 'Quem mantém a Open Library?', options: ['Google', 'Internet Archive'], correctAnswer: 1 },
+          { question: 'É gratuito?', options: ['Sim', 'Não'], correctAnswer: 0 }
+        ]
+      }
+    }
   },
   {
     id: 'tvmaze',
@@ -389,7 +623,20 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'How do you search for a single show?', options: ['/singlesearch/shows', '/one/show'], correctAnswer: 0 },
       { question: 'Is auth needed?', options: ['Yes', 'No'], correctAnswer: 1 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Entretenimento',
+        description: 'Informações sobre programas de TV.',
+        jsonExplanation: { 'show.name': 'Título', 'show.summary': 'Resumo HTML', 'show.image.medium': 'URL do Poster' },
+        securityChecklist: ['Sanitize o HTML de "summary" antes de renderizar.'],
+        exercise: 'Pesquise por "Breaking Bad" e mostre a data de estreia.',
+        quiz: [
+          { question: 'Como pesquisar por um único programa?', options: ['/singlesearch/shows', '/one/show'], correctAnswer: 0 },
+          { question: 'Auth é necessária?', options: ['Sim', 'Não'], correctAnswer: 1 }
+        ]
+      }
+    }
   },
   {
     id: 'universities',
@@ -410,7 +657,20 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'Who maintains the data?', options: ['Hipo', 'Harvard'], correctAnswer: 0 },
       { question: 'Can you search by name?', options: ['Yes', 'No'], correctAnswer: 0 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Educação',
+        description: 'Pesquise universidades em todo o mundo.',
+        jsonExplanation: { 'name': 'Nome da Universidade', 'web_pages': 'Array de URLs', 'alpha_two_code': 'Código do país' },
+        securityChecklist: ['Nota: usa HTTP, pode precisar de upgrade para HTTPS.'],
+        exercise: 'Liste as primeiras 5 universidades no "Canadá".',
+        quiz: [
+          { question: 'Quem mantém os dados?', options: ['Hipo', 'Harvard'], correctAnswer: 0 },
+          { question: 'Pode pesquisar por nome?', options: ['Sim', 'Não'], correctAnswer: 0 }
+        ]
+      }
+    }
   },
   {
     id: 'exchange-rate',
@@ -431,6 +691,37 @@ export const APIS: ApiDefinition[] = [
     quiz: [
       { question: 'What is the base currency in the example?', options: ['USD', 'EUR'], correctAnswer: 0 },
       { question: 'Is the API key part of the path or query?', options: ['Path', 'Query'], correctAnswer: 0 }
-    ]
+    ],
+    translations: {
+      pt: {
+        category: 'Finanças',
+        description: 'Taxas de câmbio de moedas gratuitas e confiáveis.',
+        jsonExplanation: { 'conversion_rates': 'Objeto com códigos de moeda como chaves', 'base_code': 'A moeda base' },
+        securityChecklist: ['Cache as taxas! Preços mudam lentamente.', 'Proteja sua chave via proxy.'],
+        exercise: 'Converta 100 USD para JPY usando a taxa.',
+        quiz: [
+          { question: 'Qual é a moeda base no exemplo?', options: ['USD', 'EUR'], correctAnswer: 0 },
+          { question: 'A chave da API faz parte do caminho ou query?', options: ['Caminho', 'Query'], correctAnswer: 0 }
+        ]
+      }
+    }
   }
 ];
+
+export const APIS = RAW_APIS;
+
+// Helper to get localized list
+export const getLocalizedApis = (lang: 'en' | 'pt'): ApiDefinition[] => {
+  if (lang === 'en') return RAW_APIS;
+  
+  return RAW_APIS.map(api => {
+    const translation = api.translations?.pt;
+    if (!translation) return api;
+    
+    return {
+      ...api,
+      ...translation,
+      // Merge partials if needed, though spreading handles simple replacements
+    };
+  });
+};

@@ -1,15 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { APIS } from '../constants';
+import { getLocalizedApis } from '../constants';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { ArrowRight, Lock, Unlock, Zap } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const Home: React.FC = () => {
   const { theme } = useTheme();
+  const { language, t } = useLanguage();
+  const apis = getLocalizedApis(language);
 
   // Calculate Stats
-  const categoryCount = APIS.reduce((acc, api) => {
+  const categoryCount = apis.reduce((acc, api) => {
     acc[api.category] = (acc[api.category] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
@@ -19,8 +22,8 @@ const Home: React.FC = () => {
     count: categoryCount[key]
   }));
 
-  const authCount = APIS.filter(a => a.authRequired).length;
-  const noAuthCount = APIS.length - authCount;
+  const authCount = apis.filter(a => a.authRequired).length;
+  const noAuthCount = apis.length - authCount;
 
   // Chart styling based on theme
   const chartAxisColor = theme === 'dark' ? '#94a3b8' : '#6b7280';
@@ -30,16 +33,16 @@ const Home: React.FC = () => {
     <div className="max-w-6xl mx-auto space-y-8">
       {/* Hero */}
       <section className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-lg">
-        <h1 className="text-3xl md:text-5xl font-bold mb-4">Master APIs by Doing</h1>
+        <h1 className="text-3xl md:text-5xl font-bold mb-4">{t('hero_title')}</h1>
         <p className="text-blue-100 text-lg max-w-2xl mb-8">
-          A hands-on interactive guide to 20 free public APIs. Learn endpoints, authentication, and integration patterns with live sandboxes and code snippets.
+          {t('hero_subtitle')}
         </p>
         <div className="flex gap-4">
           <Link to="/tutorial" className="bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors inline-flex items-center">
-            Start Tutorial <ArrowRight className="ml-2 w-4 h-4" />
+            {t('start_tutorial')} <ArrowRight className="ml-2 w-4 h-4" />
           </Link>
           <Link to="/api/rest-countries" className="bg-blue-800 bg-opacity-40 text-white px-6 py-3 rounded-lg font-semibold hover:bg-opacity-60 transition-colors">
-            Browse APIs
+            {t('browse_apis')}
           </Link>
         </div>
       </section>
@@ -49,32 +52,32 @@ const Home: React.FC = () => {
         <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800">
           <div className="flex items-center gap-3 mb-2 text-gray-500 dark:text-slate-400">
             <Unlock className="w-5 h-5 text-green-500" />
-            <h3 className="font-medium">No Auth Required</h3>
+            <h3 className="font-medium">{t('no_auth')}</h3>
           </div>
           <p className="text-3xl font-bold text-gray-800 dark:text-white">{noAuthCount}</p>
-          <p className="text-sm text-gray-400 dark:text-slate-500">Great for beginners</p>
+          <p className="text-sm text-gray-400 dark:text-slate-500">{t('no_auth_desc')}</p>
         </div>
         <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800">
           <div className="flex items-center gap-3 mb-2 text-gray-500 dark:text-slate-400">
             <Lock className="w-5 h-5 text-amber-500" />
-            <h3 className="font-medium">API Key Needed</h3>
+            <h3 className="font-medium">{t('api_key')}</h3>
           </div>
           <p className="text-3xl font-bold text-gray-800 dark:text-white">{authCount}</p>
-          <p className="text-sm text-gray-400 dark:text-slate-500">Real-world practice</p>
+          <p className="text-sm text-gray-400 dark:text-slate-500">{t('api_key_desc')}</p>
         </div>
         <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800">
           <div className="flex items-center gap-3 mb-2 text-gray-500 dark:text-slate-400">
             <Zap className="w-5 h-5 text-blue-500" />
-            <h3 className="font-medium">Total APIs</h3>
+            <h3 className="font-medium">{t('total_apis')}</h3>
           </div>
-          <p className="text-3xl font-bold text-gray-800 dark:text-white">{APIS.length}</p>
-          <p className="text-sm text-gray-400 dark:text-slate-500">Across {chartData.length} categories</p>
+          <p className="text-3xl font-bold text-gray-800 dark:text-white">{apis.length}</p>
+          <p className="text-sm text-gray-400 dark:text-slate-500">{t('across_categories').replace('{{count}}', String(chartData.length))}</p>
         </div>
       </div>
 
       {/* Categories Chart */}
       <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800">
-        <h2 className="text-xl font-bold mb-6 text-gray-800 dark:text-white">API Categories</h2>
+        <h2 className="text-xl font-bold mb-6 text-gray-800 dark:text-white">{t('categories_title')}</h2>
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData}>
@@ -93,9 +96,9 @@ const Home: React.FC = () => {
 
       {/* Featured APIs */}
       <div>
-        <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Featured Integrations</h2>
+        <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">{t('featured_title')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {APIS.slice(0, 6).map(api => (
+          {apis.slice(0, 6).map(api => (
             <Link key={api.id} to={`/api/${api.id}`} className="block group">
               <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 hover:shadow-md dark:hover:border-slate-700 transition-all h-full flex flex-col">
                 <div className="flex justify-between items-start mb-4">
@@ -115,7 +118,7 @@ const Home: React.FC = () => {
                   {api.description}
                 </p>
                 <div className="mt-4 flex items-center text-sm font-medium text-blue-600 dark:text-blue-400">
-                  Try it out <ArrowRight className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" />
+                  {t('try_it')} <ArrowRight className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
             </Link>

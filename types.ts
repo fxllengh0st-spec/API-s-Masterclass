@@ -1,3 +1,4 @@
+
 export interface QuizQuestion {
   question: string;
   options: string[];
@@ -19,6 +20,17 @@ export interface ApiDefinition {
   exercise: string;
   quiz: QuizQuestion[];
   mockResponse: any;
+  // Translation Overrides
+  translations?: {
+    pt?: {
+      description?: string;
+      category?: string;
+      jsonExplanation?: Record<string, string>;
+      securityChecklist?: string[];
+      exercise?: string;
+      quiz?: QuizQuestion[];
+    }
+  }
 }
 
 export interface ApiStat {
