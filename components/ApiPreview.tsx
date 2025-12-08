@@ -192,7 +192,7 @@ export const ApiPreview: React.FC<{ id: string, data: any }> = ({ id, data }) =>
         );
         case 'ipify': return (
             <div className="bg-slate-800 text-white p-8 rounded-xl shadow-lg text-center max-w-md mx-auto font-mono border-2 border-green-500">
-                <p className="text-green-400 text-sm mb-2">> WHOAMI</p>
+                <p className="text-green-400 text-sm mb-2">&gt; WHOAMI</p>
                 <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">{data.ip}</h2>
             </div>
         );
