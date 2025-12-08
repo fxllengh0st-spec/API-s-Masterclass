@@ -60,6 +60,13 @@ export const UI_TRANSLATIONS = {
     view_preview: 'View Rendered',
     rendered_preview: 'Rendered Data Example',
 
+    // AI Tutor
+    ai_tutor_title: 'AI Tutor',
+    ai_welcome: 'Hi! I can help you understand this API or debug the response. Ask me anything!',
+    ai_placeholder: 'Ask about this API...',
+    ai_thinking: 'Thinking...',
+    ai_send: 'Send',
+
     // Tutorial
     tutorial_title: 'Your First API Integration',
     tutorial_subtitle: 'From zero to data in 5 minutes. We\'ll build a simple script to fetch user data.',
@@ -141,6 +148,13 @@ export const UI_TRANSLATIONS = {
     no_auth_tag: 'Sem Auth',
     view_preview: 'Ver Visualização',
     rendered_preview: 'Exemplo de Dados Renderizados',
+    
+    // AI Tutor
+    ai_tutor_title: 'Tutor IA',
+    ai_welcome: 'Oi! Posso ajudar a entender essa API ou debugar a resposta. Pergunte qualquer coisa!',
+    ai_placeholder: 'Pergunte sobre esta API...',
+    ai_thinking: 'Pensando...',
+    ai_send: 'Enviar',
 
     // Tutorial
     tutorial_title: 'Sua Primeira Integração de API',

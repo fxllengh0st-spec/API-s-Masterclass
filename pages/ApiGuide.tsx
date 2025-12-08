@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link } from '../App';
 import { getLocalizedApis } from '../constants';
 import { runApiRequest } from '../services/apiRunner';
 import { Play, CheckCircle, AlertTriangle, ExternalLink, RefreshCw, Key, Shield, Code, FileJson, XCircle, Info, ToggleLeft, ToggleRight, History, RotateCcw, ArrowRight, Eye } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { ApiPreview } from '../components/ApiPreview';
+import { AiTutor } from '../components/AiTutor';
 
 interface HistoryItem {
   id: number;
@@ -316,7 +317,7 @@ const ApiGuide: React.FC = () => {
 
         {/* SANDBOX TAB */}
         {activeTab === 'sandbox' && (
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col h-full relative">
             <div className="mb-6">
               {/* Method & Endpoint Row */}
               <div className="mb-4">
@@ -505,6 +506,14 @@ const ApiGuide: React.FC = () => {
                   </div>
                )}
             </div>
+            
+            {/* AI Tutor Integration */}
+            <AiTutor 
+                apiDefinition={api}
+                lastResponse={response}
+                lastStatus={responseStatus}
+                isError={isError}
+            />
           </div>
         )}
 
