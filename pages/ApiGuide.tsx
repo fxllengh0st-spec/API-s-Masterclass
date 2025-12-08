@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from '../App';
 import { getLocalizedApis } from '../constants';
 import { runApiRequest } from '../services/apiRunner';
-import { Play, CheckCircle, AlertTriangle, ExternalLink, RefreshCw, Key, Shield, Code, FileJson, XCircle, Info, ToggleLeft, ToggleRight, History, RotateCcw, ArrowRight, Eye } from 'lucide-react';
+import { Play, CheckCircle, AlertTriangle, ExternalLink, RefreshCw, Key, Shield, Code, FileJson, XCircle, Info, ToggleLeft, ToggleRight, History, RotateCcw, ArrowRight, Eye, Wrench, Globe } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { ApiPreview } from '../components/ApiPreview';
 import { AiTutor } from '../components/AiTutor';
@@ -17,6 +17,7 @@ interface HistoryItem {
     isMockMode: boolean;
     apiKey: string;
     editableMockData: string;
+    useProxy: boolean;
   };
 }
 
@@ -24,7 +25,7 @@ const ApiGuide: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { language, t } = useLanguage();
   
-  // Fix: Memoize the API lookup to prevent object reference changes on every render (especially in PT mode)
+  // Fix: Memoize the API lookup to prevent object reference changes on every render
   const api = useMemo(() => {
     return getLocalizedApis(language).find(a => a.id === id);
   }, [language, id]);
@@ -36,13 +37,17 @@ const ApiGuide: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<any>(null);
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
-  const [responseSource, setResponseSource] = useState<'Live' | 'Mock' | 'Custom Mock' | null>(null);
+  const [responseSource, setResponseSource] = useState<'Live' | 'Mock' | 'Proxy' | 'Custom Mock' | null>(null);
   const [isError, setIsError] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
 
   // Mock Mode State
   const [isMockMode, setIsMockMode] = useState(false);
   const [editableMockData, setEditableMockData] = useState('');
+  
+  // Proxy / CORS Fix State
+  const [useProxy, setUseProxy] = useState(false);
+  const [showCorsInfo, setShowCorsInfo] = useState(false);
   
   // History State
   const [history, setHistory] = useState<HistoryItem[]>([]);
@@ -53,7 +58,7 @@ const ApiGuide: React.FC = () => {
   const [showScore, setShowScore] = useState(false);
 
   useEffect(() => {
-    // Reset state ONLY when ID changes, not when API object reference updates (fixing PT-BR bug)
+    // Reset state ONLY when ID changes
     setActiveTab('guide');
     setResponse(null);
     setApiKey('');
@@ -65,32 +70,39 @@ const ApiGuide: React.FC = () => {
     setShowScore(false);
     setHistory([]);
     setShowPreviewModal(false);
+    setUseProxy(false);
+    setShowCorsInfo(false);
     
     // Reset Mock Mode
     setIsMockMode(false);
     if (api) {
         setEditableMockData(JSON.stringify(api.mockResponse, null, 2));
     }
-  }, [id]); // Removed 'api' from dependencies to prevent reset on re-renders
+  }, [id]);
 
   if (!api) {
     return <div className="p-8 text-center text-gray-500 dark:text-slate-400">API not found. <Link to="/" className="text-blue-600">Go Home</Link></div>;
   }
 
-  const handleRun = async () => {
+  const handleRun = async (overrideProxyState?: boolean) => {
     setLoading(true);
     setResponse(null);
     setIsError(false);
     setShowPreviewModal(false);
     
+    // Determine proxy state: use override if provided (for the Fix button), otherwise current state
+    const runWithProxy = overrideProxyState !== undefined ? overrideProxyState : useProxy;
+    
     const startTime = performance.now();
     let resultStatus: number | null = null;
-    let resultSource: 'Live' | 'Mock' | 'Custom Mock' | null = null;
+    let resultSource: 'Live' | 'Mock' | 'Proxy' | 'Custom Mock' | null = null;
+    
     // Capture config at start of run
     const runConfig = {
         isMockMode,
         apiKey,
-        editableMockData
+        editableMockData,
+        useProxy: runWithProxy
     };
 
     // Handle Mock Mode
@@ -118,8 +130,8 @@ const ApiGuide: React.FC = () => {
             setIsError(true);
         }
     } else {
-        // Handle Live Request
-        const result = await runApiRequest(api, apiKey);
+        // Handle Live Request (with optional Proxy)
+        const result = await runApiRequest(api, apiKey, runWithProxy);
         
         setResponse(result.data);
         setResponseStatus(result.status);
@@ -146,16 +158,25 @@ const ApiGuide: React.FC = () => {
     setLoading(false);
   };
 
+  const handleFixCors = () => {
+      setUseProxy(true);
+      setShowCorsInfo(true);
+      handleRun(true); // Force run with proxy true
+  };
+
   const restoreRequest = (item: HistoryItem) => {
     setIsMockMode(item.config.isMockMode);
     setApiKey(item.config.apiKey);
     setEditableMockData(item.config.editableMockData);
+    setUseProxy(item.config.useProxy || false);
+    
     // Clear current results to indicate state change and readiness to re-run
     setResponse(null);
     setResponseStatus(null);
     setResponseSource(null);
     setIsError(false);
     setShowPreviewModal(false);
+    setShowCorsInfo(false);
   };
 
   const handleAnswerOptionClick = (optionIndex: number) => {
@@ -169,6 +190,13 @@ const ApiGuide: React.FC = () => {
       setShowScore(true);
     }
   };
+
+  // Helper to detect if the error is likely CORS/Network related
+  const isCorsError = isError && response?.error && (
+      response.error.includes('Network Error') || 
+      response.error.includes('CORS') || 
+      response.error.includes('Failed to fetch')
+  );
 
   const getErrorSuggestion = (status: number | null) => {
     if (status === 0) return language === 'pt' 
@@ -393,7 +421,7 @@ const ApiGuide: React.FC = () => {
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <button
-                  onClick={handleRun}
+                  onClick={() => handleRun()}
                   disabled={loading}
                   className={`w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
                       loading 
@@ -418,14 +446,43 @@ const ApiGuide: React.FC = () => {
             {/* Split Layout: Response (Left) & History (Right) */}
             <div className="flex flex-col lg:flex-row gap-6 items-stretch flex-1 min-h-0">
                <div className="flex-1 flex flex-col min-w-0">
-                  {/* Error Banner */}
+                  {/* Educational CORS Info Banner */}
+                  {showCorsInfo && (
+                     <div className="mb-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                         <div className="flex items-start gap-3">
+                             <Globe className="text-blue-600 dark:text-blue-400 shrink-0 mt-1" size={20} />
+                             <div>
+                                 <h4 className="font-bold text-blue-800 dark:text-blue-300 text-sm">{t('cors_fixed_title')}</h4>
+                                 <p className="text-sm text-blue-700 dark:text-blue-200/80 mt-1">{t('cors_fixed_desc')}</p>
+                             </div>
+                         </div>
+                     </div>
+                  )}
+
+                  {/* Error Banner with Fix Action */}
                   {isError && (
-                    <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4 flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                      <XCircle className="text-red-600 dark:text-red-400 shrink-0 mt-0.5" size={20} />
-                      <div className="flex-1">
-                        <h4 className="font-bold text-red-800 dark:text-red-300 text-sm">{t('request_failed')} {responseStatus ? `(${t('status')}: ${responseStatus})` : ''}</h4>
-                        <p className="text-sm text-red-700 dark:text-red-400 mt-1">{getErrorSuggestion(responseStatus)}</p>
+                    <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4 flex flex-col sm:flex-row sm:items-start gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="flex items-start gap-3 flex-1">
+                          <XCircle className="text-red-600 dark:text-red-400 shrink-0 mt-0.5" size={20} />
+                          <div>
+                            <h4 className="font-bold text-red-800 dark:text-red-300 text-sm">{t('request_failed')} {responseStatus ? `(${t('status')}: ${responseStatus})` : ''}</h4>
+                            <p className="text-sm text-red-700 dark:text-red-400 mt-1">{getErrorSuggestion(responseStatus)}</p>
+                          </div>
                       </div>
+                      
+                      {/* Fix Button for CORS/Network Errors */}
+                      {isCorsError && !useProxy && (
+                          <button 
+                             onClick={handleFixCors}
+                             className="shrink-0 flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg shadow-sm hover:bg-red-50 dark:hover:bg-red-900/30 font-bold text-xs uppercase tracking-wide transition-all transform hover:scale-105"
+                          >
+                             <Wrench size={14} /> {t('fix_cors_btn')}
+                          </button>
+                      )}
+                      
+                      {useProxy && loading && isCorsError && (
+                          <span className="text-xs font-bold text-blue-600 animate-pulse">{t('fixing')}</span>
+                      )}
                     </div>
                   )}
 
@@ -437,9 +494,14 @@ const ApiGuide: React.FC = () => {
                          </span>
                        )}
                        {responseSource && (
-                         <span className={`px-2 py-1 rounded text-xs font-bold ${responseSource.includes('Mock') ? 'bg-purple-500 text-white' : 'bg-blue-500 text-white'}`}>
+                         <span className={`px-2 py-1 rounded text-xs font-bold ${responseSource.includes('Mock') ? 'bg-purple-500 text-white' : responseSource === 'Proxy' ? 'bg-orange-500 text-white' : 'bg-blue-500 text-white'}`}>
                            {t('source')}: {responseSource}
                          </span>
+                       )}
+                       {useProxy && !isError && (
+                           <span className="px-2 py-1 rounded text-xs font-bold bg-orange-900/50 text-orange-400 border border-orange-800 flex items-center gap-1">
+                               <Globe size={10} /> {t('proxy_active')}
+                           </span>
                        )}
                        {response && !isError && (
                           <button 

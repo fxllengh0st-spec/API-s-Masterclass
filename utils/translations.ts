@@ -60,6 +60,13 @@ export const UI_TRANSLATIONS = {
     no_auth_tag: 'No Auth',
     view_preview: 'View Rendered',
     rendered_preview: 'Rendered Data Example',
+    
+    // CORS Fix Feature
+    fix_cors_btn: 'Fix CORS Issue (Use Proxy)',
+    fixing: 'Fixing...',
+    cors_fixed_title: 'Connection Fixed via Proxy',
+    cors_fixed_desc: 'Browsers block requests to different domains (CORS) for security. In production, your backend handles this. Here, we routed your request through a public proxy to simulate a backend.',
+    proxy_active: 'Proxy Active',
 
     // AI Tutor
     ai_tutor_title: 'AI Tutor',
@@ -160,6 +167,13 @@ export const UI_TRANSLATIONS = {
     no_auth_tag: 'Sem Auth',
     view_preview: 'Ver Visualização',
     rendered_preview: 'Exemplo de Dados Renderizados',
+
+    // CORS Fix Feature
+    fix_cors_btn: 'Corrigir Erro de CORS (Usar Proxy)',
+    fixing: 'Corrigindo...',
+    cors_fixed_title: 'Conexão Corrigida via Proxy',
+    cors_fixed_desc: 'Navegadores bloqueiam requisições a domínios diferentes (CORS) por segurança. Em produção, seu backend resolve isso. Aqui, roteamos sua requisição via Proxy público para simular.',
+    proxy_active: 'Proxy Ativo',
     
     // AI Tutor
     ai_tutor_title: 'Tutor IA',

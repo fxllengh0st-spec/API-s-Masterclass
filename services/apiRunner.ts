@@ -5,12 +5,13 @@ interface ExecutionResult {
   data: any;
   status: number;
   duration: number;
-  source: 'Live' | 'Mock';
+  source: 'Live' | 'Mock' | 'Proxy';
 }
 
 export const runApiRequest = async (
   api: ApiDefinition,
-  userKey?: string
+  userKey?: string,
+  useProxy: boolean = false
 ): Promise<ExecutionResult> => {
   const startTime = performance.now();
   
@@ -29,20 +30,26 @@ export const runApiRequest = async (
 
   try {
     let url = api.endpoint;
+    
+    // Inject Key if present
+    if (userKey) {
+      const separator = url.includes('?') ? '&' : '?';
+      // Attempt to cover common parameter names for API keys
+      url += `${separator}appid=${userKey}&api_key=${userKey}&key=${userKey}&access_key=${userKey}`;
+    }
+
+    // Handle Proxy Wrapping
+    if (useProxy) {
+        // Using allorigins.win as a stable, free CORS proxy for educational purposes
+        url = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+    }
+
     const options: RequestInit = {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     };
-
-    // Simple key injection logic for demonstration
-    // In a real backend proxy, this would be handled securely and specifically per API
-    if (userKey) {
-      const separator = url.includes('?') ? '&' : '?';
-      // Attempt to cover common parameter names for API keys
-      url += `${separator}appid=${userKey}&api_key=${userKey}&key=${userKey}&access_key=${userKey}`;
-    }
 
     const response = await fetch(url, options);
     
@@ -71,7 +78,7 @@ export const runApiRequest = async (
       data: data,
       status: response.status,
       duration: Math.round(performance.now() - startTime),
-      source: 'Live',
+      source: useProxy ? 'Proxy' : 'Live',
     };
 
   } catch (error: any) {
@@ -87,7 +94,7 @@ export const runApiRequest = async (
       data: { error: errorMessage },
       status: 0,
       duration: Math.round(performance.now() - startTime),
-      source: 'Live',
+      source: useProxy ? 'Proxy' : 'Live',
     };
   }
 };
