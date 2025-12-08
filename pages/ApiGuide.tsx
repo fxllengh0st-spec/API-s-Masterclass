@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from '../App';
 import { getLocalizedApis } from '../constants';
 import { runApiRequest } from '../services/apiRunner';
@@ -23,7 +23,11 @@ interface HistoryItem {
 const ApiGuide: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { language, t } = useLanguage();
-  const api = getLocalizedApis(language).find(a => a.id === id);
+  
+  // Fix: Memoize the API lookup to prevent object reference changes on every render (especially in PT mode)
+  const api = useMemo(() => {
+    return getLocalizedApis(language).find(a => a.id === id);
+  }, [language, id]);
 
   const [activeTab, setActiveTab] = useState<'guide' | 'sandbox' | 'quiz'>('guide');
   const [apiKey, setApiKey] = useState('');
@@ -49,7 +53,7 @@ const ApiGuide: React.FC = () => {
   const [showScore, setShowScore] = useState(false);
 
   useEffect(() => {
-    // Reset state when API changes
+    // Reset state ONLY when ID changes, not when API object reference updates (fixing PT-BR bug)
     setActiveTab('guide');
     setResponse(null);
     setApiKey('');
@@ -67,7 +71,7 @@ const ApiGuide: React.FC = () => {
     if (api) {
         setEditableMockData(JSON.stringify(api.mockResponse, null, 2));
     }
-  }, [id, api]); 
+  }, [id]); // Removed 'api' from dependencies to prevent reset on re-renders
 
   if (!api) {
     return <div className="p-8 text-center text-gray-500 dark:text-slate-400">API not found. <Link to="/" className="text-blue-600">Go Home</Link></div>;

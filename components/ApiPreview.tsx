@@ -1,5 +1,5 @@
 import React from 'react';
-import { Cloud, Wind, MapPin, User, DollarSign, ExternalLink, Calendar, BookOpen, Film, Radio, Smile, Globe } from 'lucide-react';
+import { Cloud, Wind, MapPin, User, DollarSign, ExternalLink, Calendar, BookOpen, Film, Radio, Smile, Globe, FileText, GraduationCap, TrendingUp } from 'lucide-react';
 
 const WeatherPreview = ({ data }: { data: any }) => {
    if (!data || !data.main) return <div className="text-red-500">Incomplete Weather Data</div>;
@@ -105,6 +105,71 @@ const NewsPreview = ({ data }: { data: any }) => {
     );
 }
 
+const PostPreview = ({ data }: { data: any }) => (
+    <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg max-w-md mx-auto border-l-4 border-blue-500 relative">
+        <FileText className="absolute top-6 right-6 text-gray-200 dark:text-slate-700 w-12 h-12" />
+        <h3 className="font-bold text-xl text-gray-900 dark:text-white mb-2 pr-8">{data.title}</h3>
+        <p className="text-gray-600 dark:text-slate-400 leading-relaxed text-sm mb-4">{data.body}</p>
+        <div className="flex gap-2 text-xs font-mono text-gray-400">
+            <span>UserID: {data.userId}</span>
+            <span>ID: {data.id}</span>
+        </div>
+    </div>
+);
+
+const BookPreview = ({ data }: { data: any }) => {
+    const book = data.docs ? data.docs[0] : data;
+    if (!book) return <div>No book data</div>;
+    return (
+        <div className="bg-amber-50 dark:bg-amber-900/10 p-6 rounded-xl shadow-lg max-w-md mx-auto flex gap-4 border border-amber-100 dark:border-amber-900/30">
+            <div className="w-20 h-28 bg-amber-200 dark:bg-amber-800 rounded shadow-inner flex items-center justify-center shrink-0">
+                <BookOpen className="text-amber-700 dark:text-amber-200 opacity-50" />
+            </div>
+            <div>
+                <h3 className="font-bold text-lg text-gray-900 dark:text-white leading-tight mb-1">{book.title}</h3>
+                <p className="text-sm text-gray-700 dark:text-slate-300 mb-2">by {book.author_name?.[0]}</p>
+                <span className="inline-block px-2 py-1 bg-white dark:bg-slate-900 rounded text-xs font-mono text-gray-500 dark:text-slate-400 border border-amber-200 dark:border-amber-800">
+                    {book.first_publish_year}
+                </span>
+            </div>
+        </div>
+    )
+};
+
+const UniPreview = ({ data }: { data: any }) => {
+    const uni = Array.isArray(data) ? data[0] : data;
+    return (
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg max-w-md mx-auto text-center border-t-4 border-blue-800">
+            <GraduationCap className="w-12 h-12 text-blue-800 dark:text-blue-400 mx-auto mb-3" />
+            <h3 className="font-bold text-xl text-gray-900 dark:text-white mb-1">{uni.name}</h3>
+            <p className="text-gray-500 dark:text-slate-400 text-sm mb-4">{uni.country}</p>
+            {uni.web_pages?.[0] && (
+                <a href={uni.web_pages[0]} target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-400 text-sm hover:underline">
+                    {uni.web_pages[0]}
+                </a>
+            )}
+        </div>
+    );
+};
+
+const ExchangePreview = ({ data }: { data: any }) => {
+    const rates = data.conversion_rates || {};
+    const firstRate = Object.keys(rates)[0];
+    return (
+        <div className="bg-slate-900 text-white p-6 rounded-xl shadow-lg max-w-xs mx-auto text-center border border-slate-700">
+            <div className="flex items-center justify-center gap-2 mb-4 text-green-400">
+                <TrendingUp /> <span className="font-bold">FOREX</span>
+            </div>
+            <div className="text-3xl font-bold mb-1">{data.base_code}</div>
+            <div className="text-sm text-slate-500 mb-4">Base Currency</div>
+            <div className="bg-slate-800 rounded p-3">
+                 <div className="text-xs text-slate-400 uppercase mb-1">Exchange Rate ({firstRate})</div>
+                 <div className="text-xl font-mono">{rates[firstRate]}</div>
+            </div>
+        </div>
+    );
+};
+
 // Main Component
 export const ApiPreview: React.FC<{ id: string, data: any }> = ({ id, data }) => {
   if (!data) return <div className="text-center p-4 text-gray-500">No data to display</div>;
@@ -192,7 +257,7 @@ export const ApiPreview: React.FC<{ id: string, data: any }> = ({ id, data }) =>
         );
         case 'ipify': return (
             <div className="bg-slate-800 text-white p-8 rounded-xl shadow-lg text-center max-w-md mx-auto font-mono border-2 border-green-500">
-                <p className="text-green-400 text-sm mb-2"> WHOAMI</p>
+                <p className="text-green-400 text-sm mb-2">&gt; WHOAMI</p>
                 <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">{data.ip}</h2>
             </div>
         );
@@ -245,6 +310,11 @@ export const ApiPreview: React.FC<{ id: string, data: any }> = ({ id, data }) =>
                      </div>
                  </div>
              );
+        // New Added Cases
+        case 'jsonplaceholder': return <PostPreview data={data} />;
+        case 'open-library': return <BookPreview data={data} />;
+        case 'universities': return <UniPreview data={data} />;
+        case 'exchange-rate': return <ExchangePreview data={data} />;
         
         // Default generic visualization
         default: return (

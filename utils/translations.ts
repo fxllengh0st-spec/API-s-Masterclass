@@ -1,3 +1,4 @@
+
 export const UI_TRANSLATIONS = {
   en: {
     // Layout
@@ -66,6 +67,17 @@ export const UI_TRANSLATIONS = {
     ai_placeholder: 'Ask about this API...',
     ai_thinking: 'Thinking...',
     ai_send: 'Send',
+    ai_fallback_badge: 'Offline Mode',
+    
+    // Fallback Responses (Decision Tree)
+    fb_intro: 'I\'m currently unable to connect to the cloud (Quota/Network), but I can help using my internal logic database.',
+    fb_error_401: 'I see a 401 Unauthorized error. This usually means the API Key is missing or invalid. Check the "Authentication" section.',
+    fb_error_403: 'A 403 Forbidden error means the server understood the request but refuses to authorize it. You might be rate-limited.',
+    fb_error_404: 'A 404 Not Found means the Endpoint URL is incorrect or the resource doesn\'t exist.',
+    fb_error_generic: 'The request failed. Please check your internet connection or if the API service is down.',
+    fb_code_help: 'Here is the basic implementation for this API:',
+    fb_json_help: 'The response structure usually contains these key fields:',
+    fb_default: 'I can help you understand the {{name}} API. Try running a request first, or ask about "code", "error" or "json".',
 
     // Tutorial
     tutorial_title: 'Your First API Integration',
@@ -155,6 +167,17 @@ export const UI_TRANSLATIONS = {
     ai_placeholder: 'Pergunte sobre esta API...',
     ai_thinking: 'Pensando...',
     ai_send: 'Enviar',
+    ai_fallback_badge: 'Modo Offline',
+
+    // Fallback Responses (Decision Tree)
+    fb_intro: 'Não consigo conectar à nuvem no momento (Cota/Rede), mas posso ajudar usando minha lógica interna.',
+    fb_error_401: 'Vejo um erro 401 (Não Autorizado). Geralmente isso significa que a Chave da API está faltando ou é inválida.',
+    fb_error_403: 'Um erro 403 (Proibido) significa que o servidor recusou autorizar. Você pode estar bloqueado ou atingiu o limite.',
+    fb_error_404: 'Um 404 (Não Encontrado) significa que a URL do Endpoint está incorreta ou o recurso não existe.',
+    fb_error_generic: 'A requisição falhou. Verifique sua conexão com a internet ou se o serviço da API está fora do ar.',
+    fb_code_help: 'Aqui está a implementação básica para esta API:',
+    fb_json_help: 'A estrutura da resposta geralmente contém estes campos principais:',
+    fb_default: 'Posso ajudar você a entender a API {{name}}. Tente rodar uma requisição primeiro, ou pergunte sobre "código", "erro" ou "json".',
 
     // Tutorial
     tutorial_title: 'Sua Primeira Integração de API',

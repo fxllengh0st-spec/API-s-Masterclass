@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, X, Sparkles, MessageSquare } from 'lucide-react';
+import { Send, Bot, X, Sparkles, AlertTriangle, WifiOff } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import { useLanguage } from '../context/LanguageContext';
 import { ApiDefinition } from '../types';
@@ -8,6 +8,7 @@ interface Message {
   id: string;
   role: 'user' | 'model';
   text: string;
+  isFallback?: boolean;
 }
 
 interface AiTutorProps {
@@ -46,6 +47,37 @@ export const AiTutor: React.FC<AiTutorProps> = ({ apiDefinition, lastResponse, l
     }
   }, [t]);
 
+  // --- DECISION TREE LOGIC (FALLBACK) ---
+  const getFallbackResponse = (query: string): string => {
+      const lowerQuery = query.toLowerCase();
+      let response = t('fb_intro') + '\n\n';
+
+      // 1. Check for recent Error Context
+      if (isError && (lowerQuery.includes('error') || lowerQuery.includes('fail') || lowerQuery.includes('problem') || lowerQuery.includes('erro') || lowerQuery.includes('falha'))) {
+          if (lastStatus === 401) return response + t('fb_error_401');
+          if (lastStatus === 403) return response + t('fb_error_403');
+          if (lastStatus === 404) return response + t('fb_error_404');
+          return response + t('fb_error_generic');
+      }
+
+      // 2. Check for Code/Implementation request
+      if (lowerQuery.includes('code') || lowerQuery.includes('implement') || lowerQuery.includes('fetch') || lowerQuery.includes('código') || lowerQuery.includes('como usar')) {
+          return response + `${t('fb_code_help')} \n\n ${apiDefinition.codeSnippet}`;
+      }
+
+      // 3. Check for JSON/Data structure request
+      if (lowerQuery.includes('json') || lowerQuery.includes('response') || lowerQuery.includes('data') || lowerQuery.includes('resposta') || lowerQuery.includes('campo')) {
+          let explanation = t('fb_json_help') + '\n';
+          Object.entries(apiDefinition.jsonExplanation).forEach(([key, desc]) => {
+              explanation += `- ${key}: ${desc}\n`;
+          });
+          return response + explanation;
+      }
+
+      // 4. Default Fallback
+      return response + t('fb_default').replace('{{name}}', apiDefinition.name);
+  };
+
   const handleSend = async () => {
     if (!input.trim()) return;
 
@@ -59,8 +91,26 @@ export const AiTutor: React.FC<AiTutorProps> = ({ apiDefinition, lastResponse, l
     setInput('');
     setIsLoading(true);
 
+    // Check if key exists before even trying, saves time
+    const apiKey = process.env.API_KEY;
+    
+    if (!apiKey || apiKey === '' || apiKey.includes('YOUR_API_KEY')) {
+         // Immediate fallback
+         setTimeout(() => {
+             const fallbackMsg: Message = {
+                id: (Date.now() + 1).toString(),
+                role: 'model',
+                text: getFallbackResponse(userMessage.text),
+                isFallback: true
+             };
+             setMessages(prev => [...prev, fallbackMsg]);
+             setIsLoading(false);
+         }, 500);
+         return;
+    }
+
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey: apiKey });
       
       // Construct context about the current API state
       const apiContext = `
@@ -112,13 +162,17 @@ export const AiTutor: React.FC<AiTutorProps> = ({ apiDefinition, lastResponse, l
       setMessages(prev => [...prev, aiMessage]);
 
     } catch (error) {
-      console.error("Gemini Error:", error);
-      const errorMessage: Message = {
+      console.warn("AI Unavailable, switching to decision tree", error);
+      
+      // FALLBACK MECHANISM ACTIVATED
+      const fallbackMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: 'model',
-        text: language === 'pt' ? 'Desculpe, tive um problema ao conectar com meu cérebro. Tente novamente.' : 'Sorry, I had trouble connecting to my brain. Please try again.'
+        text: getFallbackResponse(userMessage.text),
+        isFallback: true
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages(prev => [...prev, fallbackMsg]);
+
     } finally {
       setIsLoading(false);
     }
@@ -168,13 +222,18 @@ export const AiTutor: React.FC<AiTutorProps> = ({ apiDefinition, lastResponse, l
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div 
-              className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
+              className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm relative ${
                 msg.role === 'user' 
                   ? 'bg-purple-600 text-white rounded-tr-none' 
                   : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 rounded-tl-none shadow-sm'
               }`}
             >
-              {msg.text}
+              {msg.isFallback && (
+                <div className="flex items-center gap-1 text-[10px] uppercase font-bold text-amber-500 mb-1">
+                  <WifiOff size={10} /> {t('ai_fallback_badge')}
+                </div>
+              )}
+              <div className="whitespace-pre-wrap">{msg.text}</div>
             </div>
           </div>
         ))}

@@ -44,7 +44,7 @@ export function Link({ to, children, className, onClick }: any) {
   );
 }
 
-export function HashRouter({ children }: { children: React.ReactNode }) {
+export function HashRouter({ children }: { children?: React.ReactNode }) {
   const [path, setPath] = useState(window.location.hash.slice(1) || '/');
 
   useEffect(() => {
@@ -69,7 +69,7 @@ export function Route({ element }: { path?: string; element: React.ReactNode; in
     return <>{element}</>;
 }
 
-export function Routes({ children }: { children: React.ReactNode }) {
+export function Routes({ children }: { children?: React.ReactNode }) {
   const { pathname } = useLocation();
   let element = null;
   let computedParams = {};
