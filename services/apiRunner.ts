@@ -37,18 +37,34 @@ export const runApiRequest = async (
     };
 
     // Simple key injection logic for demonstration
-    // In a real backend proxy, this would be handled securely
+    // In a real backend proxy, this would be handled securely and specifically per API
     if (userKey) {
-      if (url.includes('?')) {
-        url += `&appid=${userKey}&api_key=${userKey}&key=${userKey}`; 
-      } else {
-        url += `?appid=${userKey}&api_key=${userKey}&key=${userKey}`;
-      }
-      // Specific handling for header-based auth if needed (simplified for this demo)
+      const separator = url.includes('?') ? '&' : '?';
+      // Attempt to cover common parameter names for API keys
+      url += `${separator}appid=${userKey}&api_key=${userKey}&key=${userKey}&access_key=${userKey}`;
     }
 
     const response = await fetch(url, options);
-    const data = await response.json();
+    
+    // Robustly handle response body parsing
+    let data;
+    const contentType = response.headers.get("content-type");
+    const textBody = await response.text();
+
+    try {
+      // Try to parse as JSON if header says so or if it looks like JSON
+      if (
+        (contentType && contentType.includes("application/json")) || 
+        (textBody.trim().startsWith('{') || textBody.trim().startsWith('['))
+      ) {
+        data = JSON.parse(textBody);
+      } else {
+        // Fallback for HTML error pages or plain text
+        data = textBody ? { message: textBody } : { message: response.statusText };
+      }
+    } catch (e) {
+      data = { message: "Could not parse response", raw: textBody };
+    }
 
     return {
       success: response.ok,
@@ -57,10 +73,18 @@ export const runApiRequest = async (
       duration: Math.round(performance.now() - startTime),
       source: 'Live',
     };
+
   } catch (error: any) {
+    let errorMessage = error.message || 'Network Error';
+    
+    // Heuristic for CORS or Network Failure
+    if (error.name === 'TypeError' && errorMessage === 'Failed to fetch') {
+        errorMessage = 'Network Error: The browser blocked the request. This is often due to CORS (Cross-Origin Resource Sharing) restrictions on the API or a loss of internet connection.';
+    }
+
     return {
       success: false,
-      data: { error: error.message || 'Network Error' },
+      data: { error: errorMessage },
       status: 0,
       duration: Math.round(performance.now() - startTime),
       source: 'Live',

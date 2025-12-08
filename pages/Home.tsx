@@ -2,9 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { APIS } from '../constants';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { ArrowRight, Lock, Unlock, Zap, Book } from 'lucide-react';
+import { ArrowRight, Lock, Unlock, Zap } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 const Home: React.FC = () => {
+  const { theme } = useTheme();
+
   // Calculate Stats
   const categoryCount = APIS.reduce((acc, api) => {
     acc[api.category] = (acc[api.category] || 0) + 1;
@@ -18,6 +21,10 @@ const Home: React.FC = () => {
 
   const authCount = APIS.filter(a => a.authRequired).length;
   const noAuthCount = APIS.length - authCount;
+
+  // Chart styling based on theme
+  const chartAxisColor = theme === 'dark' ? '#94a3b8' : '#6b7280';
+  const chartTooltipStyle = theme === 'dark' ? { backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f8fafc' } : {};
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
@@ -39,41 +46,41 @@ const Home: React.FC = () => {
 
       {/* Quick Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3 mb-2 text-gray-500">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800">
+          <div className="flex items-center gap-3 mb-2 text-gray-500 dark:text-slate-400">
             <Unlock className="w-5 h-5 text-green-500" />
             <h3 className="font-medium">No Auth Required</h3>
           </div>
-          <p className="text-3xl font-bold text-gray-800">{noAuthCount}</p>
-          <p className="text-sm text-gray-400">Great for beginners</p>
+          <p className="text-3xl font-bold text-gray-800 dark:text-white">{noAuthCount}</p>
+          <p className="text-sm text-gray-400 dark:text-slate-500">Great for beginners</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3 mb-2 text-gray-500">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800">
+          <div className="flex items-center gap-3 mb-2 text-gray-500 dark:text-slate-400">
             <Lock className="w-5 h-5 text-amber-500" />
             <h3 className="font-medium">API Key Needed</h3>
           </div>
-          <p className="text-3xl font-bold text-gray-800">{authCount}</p>
-          <p className="text-sm text-gray-400">Real-world practice</p>
+          <p className="text-3xl font-bold text-gray-800 dark:text-white">{authCount}</p>
+          <p className="text-sm text-gray-400 dark:text-slate-500">Real-world practice</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3 mb-2 text-gray-500">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800">
+          <div className="flex items-center gap-3 mb-2 text-gray-500 dark:text-slate-400">
             <Zap className="w-5 h-5 text-blue-500" />
             <h3 className="font-medium">Total APIs</h3>
           </div>
-          <p className="text-3xl font-bold text-gray-800">{APIS.length}</p>
-          <p className="text-sm text-gray-400">Across {chartData.length} categories</p>
+          <p className="text-3xl font-bold text-gray-800 dark:text-white">{APIS.length}</p>
+          <p className="text-sm text-gray-400 dark:text-slate-500">Across {chartData.length} categories</p>
         </div>
       </div>
 
       {/* Categories Chart */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-        <h2 className="text-xl font-bold mb-6 text-gray-800">API Categories</h2>
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800">
+        <h2 className="text-xl font-bold mb-6 text-gray-800 dark:text-white">API Categories</h2>
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData}>
-              <XAxis dataKey="name" tick={{fontSize: 12}} interval={0} angle={-25} textAnchor="end" height={60} />
-              <YAxis allowDecimals={false} />
-              <Tooltip cursor={{fill: 'transparent'}} />
+              <XAxis dataKey="name" tick={{fontSize: 12, fill: chartAxisColor}} interval={0} angle={-25} textAnchor="end" height={60} stroke={chartAxisColor} />
+              <YAxis allowDecimals={false} tick={{fill: chartAxisColor}} stroke={chartAxisColor} />
+              <Tooltip contentStyle={chartTooltipStyle} cursor={{fill: 'transparent'}} />
               <Bar dataKey="count" fill="#4f46e5" radius={[4, 4, 0, 0]}>
                 {chartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#4f46e5' : '#6366f1'} />
@@ -86,13 +93,13 @@ const Home: React.FC = () => {
 
       {/* Featured APIs */}
       <div>
-        <h2 className="text-2xl font-bold mb-4 text-gray-800">Featured Integrations</h2>
+        <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Featured Integrations</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {APIS.slice(0, 6).map(api => (
             <Link key={api.id} to={`/api/${api.id}`} className="block group">
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all h-full flex flex-col">
+              <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 hover:shadow-md dark:hover:border-slate-700 transition-all h-full flex flex-col">
                 <div className="flex justify-between items-start mb-4">
-                  <span className="inline-block px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded font-medium uppercase">
+                  <span className="inline-block px-2 py-1 bg-blue-50 dark:bg-blue-900 dark:bg-opacity-30 text-blue-600 dark:text-blue-400 text-xs rounded font-medium uppercase">
                     {api.category}
                   </span>
                   {api.authRequired ? (
@@ -101,13 +108,13 @@ const Home: React.FC = () => {
                     <Unlock className="w-4 h-4 text-green-500" />
                   )}
                 </div>
-                <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
+                <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2">
                   {api.name}
                 </h3>
-                <p className="text-sm text-gray-500 flex-1 line-clamp-2">
+                <p className="text-sm text-gray-500 dark:text-slate-400 flex-1 line-clamp-2">
                   {api.description}
                 </p>
-                <div className="mt-4 flex items-center text-sm font-medium text-blue-600">
+                <div className="mt-4 flex items-center text-sm font-medium text-blue-600 dark:text-blue-400">
                   Try it out <ArrowRight className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
