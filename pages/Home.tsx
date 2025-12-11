@@ -1,10 +1,12 @@
+
 import React from 'react';
 import { Link } from '../App';
 import { getLocalizedApis } from '../constants';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { ArrowRight, Lock, Unlock, Zap } from 'lucide-react';
+import { ArrowRight, Lock, Unlock, Zap } from 'lucide-center';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
+import { GlossaryTerm } from '../components/GlossaryTerm';
 
 const Home: React.FC = () => {
   const { theme } = useTheme();
@@ -35,7 +37,8 @@ const Home: React.FC = () => {
       <section className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-lg">
         <h1 className="text-3xl md:text-5xl font-bold mb-4">{t('hero_title')}</h1>
         <p className="text-blue-100 text-lg max-w-2xl mb-8">
-          {t('hero_subtitle')}
+          A hands-on interactive guide to 20 free public <GlossaryTerm term="api">APIs</GlossaryTerm>. 
+          Learn <GlossaryTerm term="endpoint">endpoints</GlossaryTerm>, authentication, and integration patterns with live <GlossaryTerm term="sandbox">sandboxes</GlossaryTerm> and code snippets.
         </p>
         <div className="flex gap-4">
           <Link to="/tutorial" className="bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors inline-flex items-center">
