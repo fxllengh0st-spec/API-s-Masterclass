@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Link } from '../App';
 import { getLocalizedApis } from '../constants';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { ArrowRight, Lock, Unlock, Zap } from 'lucide-center';
+import { ArrowRight, Lock, Unlock, Zap } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { GlossaryTerm } from '../components/GlossaryTerm';
